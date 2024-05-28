@@ -20,14 +20,113 @@ inquirer.prompt([
     type:"list",
     message:"What would you like to do?",
     name:"option",
-    choices:["view all departments","view all roles","view all employees","add a department","add a role","add an employee","update employee role"]
+    choices:["view all departments","view all roles","view all employees","add a department","add a role","add an employee","update an employee role"]
   }  
 ])
 .then(response=>{
     if(response.option==="view all employees"){
         viewAllEmployees()
     }
+    else if(response.option==="view all roles"){
+        viewAllRoles()
+    }
+    else if(response.option==="add an employee"){
+        addEmployee() 
+    }
+    else if(response.option==="update an employee role"){
+        updateEmployeeRole() 
+    }
 })
+}
+
+function updateEmployeeRole(){
+    db.query(`SELECT id as value, title as name from role`, (err, roleData)=>{
+
+        db.query(`SELECT id as value,CONCAT(first_name, ' ', last_name) as name from employee`, (err,employeeData)=>{
+            inquirer.prompt([
+            {
+                type:"list",
+                message:"What is your new title?",
+                name:"title",
+                choices:roleData
+            },
+            {
+                type:"list",
+                message:"Which employee was promoted?",
+                name:"employee_id",
+                choices:employeeData
+            },
+        ])
+        .then(response=>{
+
+
+
+            db.query(`UPDATE employee SET role_id=${response.role_id} WHERE id=${response.employee_id}`, (err)=>{
+
+                viewAllEmployees()
+            })
+        })
+        })
+      
+
+    })
+
+    
+
+}
+
+function addEmployee(){
+    db.query(`SELECT id as value, title as name from role`, (err, roleData)=>{
+
+        db.query(`SELECT id as value,CONCAT(first_name, ' ', last_name) as name from employee where manager_id is null`, (err,managerData)=>{
+            inquirer.prompt([{
+                type:"input",
+                message:"What is your first name?",
+                name:"first_name"
+            },
+            {
+                type:"input",
+                message:"What is your last name?",
+                name:"last_name"
+            },
+            {
+                type:"list",
+                message:"What is your title?",
+                name:"title",
+                choices:roleData
+            },
+            {
+                type:"list",
+                message:"Who is your manager?",
+                name:"manager_id",
+                choices:managerData
+            },
+        ])
+        .then(response=>{
+
+
+
+            db.query(`insert into employee(first_name, last_name, role_id, manager_id) values ("${respone.first_name}","${response.last_name}","${response.title}","${response.manager_id}")`, (err)=>{
+
+                viewAllEmployees()
+            })
+        })
+        })
+      
+
+    })
+
+    
+
+}
+
+function viewAllRoles(){
+    db.query(`SELECT role.id as id, title, name as department, salary FROM role;
+    LEFT JOIN department On role.department_id=department.id;`, (err,data)=>{
+        printTable(data)
+        menu()
+    }
+    )
 }
 function viewAllEmployees(){
     db.query(`SELECT employee.id as id, employee.first_name, employee.last_name, title, name as department, salary, CONCAT(managerTable.first_name, ' ', managerTable.last_name) as manager
