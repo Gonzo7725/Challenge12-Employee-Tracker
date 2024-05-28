@@ -36,15 +36,15 @@ inquirer.prompt([
     else if(response.option==="update an employee role"){
         updateEmployeeRole() 
     }
-    // else if(response.option==="view all departments"){
-    //     viewAllDepartments() 
-    // }
-    // else if(response.option==="add a department"){
-    //     addDepartment() 
-    // }
-    // else if(response.option==="add a role"){
-    //     addRole() 
-    // }
+    else if(response.option==="view all departments"){
+        viewAllDepartments() 
+    }
+    else if(response.option==="add a department"){
+        addDepartment() 
+    }
+    else if(response.option==="add a role"){
+        addRole() 
+    }
 })
 }
 
